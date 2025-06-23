@@ -27,8 +27,10 @@ Route::get('/admin', function () {
 
     $topupCount = Transaction::where('type', 'top-up')->count();
     $withdrawalCount = Transaction::where('type', 'withdrawal')->count();
-    $pendingTopups = Transaction::where('type', 'top-up')->where('status', 'pending')->count();
-    $pendingWithdrawals = Transaction::where('type', 'withdrawal')->where('status', 'pending')->count();
+    $pendingTopups = Transaction::where('type', 'top-up')->where('status', 'pending')->with('wallet.user')->get();
+    $pendingWithdrawals = Transaction::where('type', 'withdrawal')->where('status', 'pending')->with('wallet.admin')->get();
+
+    $permissions = $admin->permissions ?? [];
 
     return view('admin.dashboard', compact(
         'admin',
@@ -37,7 +39,8 @@ Route::get('/admin', function () {
         'topupCount',
         'withdrawalCount',
         'pendingTopups',
-        'pendingWithdrawals'
+        'pendingWithdrawals',
+        'permissions'
     ));
 })->middleware('auth:admin')->name('admin.dashboard');
 

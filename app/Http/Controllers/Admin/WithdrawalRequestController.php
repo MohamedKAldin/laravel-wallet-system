@@ -35,13 +35,13 @@ class WithdrawalRequestController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
         $admin = $request->user();
 
         if ($admin->wallet->balance < $request->amount) {
-            return response()->json(['message' => 'Insufficient balance.'], 400);
+            return redirect()->back()->with('error', 'Insufficient balance.');
         }
 
         $transaction = $admin->wallet->transactions()->create([
@@ -57,7 +57,7 @@ class WithdrawalRequestController extends Controller
         $otherAdmins = Admin::where('id', '!=', $admin->id)->get();
         Notification::send($otherAdmins, new NewWithdrawalRequest($transaction));
 
-        return response()->json($transaction, 201);
+        return redirect()->back()->with('success', 'Withdrawal request submitted successfully.');
     }
 
     /**
@@ -91,16 +91,14 @@ class WithdrawalRequestController extends Controller
         $this->authorize('update', $transaction);
 
         if ($transaction->type !== 'withdrawal' || $transaction->status !== 'pending') {
-            return response()->json(['message' => 'Invalid transaction.'], 400);
+            return redirect()->back()->with('error', 'Invalid transaction.');
         }
 
         $transaction->update(['status' => 'approved']);
-
         $transaction->wallet->decrement('held_balance', $transaction->amount);
-
         $transaction->wallet->owner->notify(new WithdrawalRequestStatusUpdated($transaction));
 
-        return response()->json($transaction);
+        return redirect()->back()->with('success', 'Withdrawal request approved successfully.');
     }
 
     public function reject(Transaction $transaction)
@@ -108,16 +106,14 @@ class WithdrawalRequestController extends Controller
         $this->authorize('update', $transaction);
 
         if ($transaction->type !== 'withdrawal' || $transaction->status !== 'pending') {
-            return response()->json(['message' => 'Invalid transaction.'], 400);
+            return redirect()->back()->with('error', 'Invalid transaction.');
         }
 
         $transaction->update(['status' => 'rejected']);
-
         $transaction->wallet->increment('balance', $transaction->amount);
         $transaction->wallet->decrement('held_balance', $transaction->amount);
-
         $transaction->wallet->owner->notify(new WithdrawalRequestStatusUpdated($transaction));
 
-        return response()->json($transaction);
+        return redirect()->back()->with('success', 'Withdrawal request rejected successfully.');
     }
 }

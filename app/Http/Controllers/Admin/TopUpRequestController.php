@@ -60,16 +60,14 @@ class TopUpRequestController extends Controller
         $this->authorize('update', $transaction);
 
         if ($transaction->type !== 'top-up' || $transaction->status !== 'pending') {
-            return response()->json(['message' => 'Invalid transaction.'], 400);
+            return redirect()->back()->with('error', 'Invalid transaction.');
         }
 
         $transaction->update(['status' => 'approved']);
-
         $transaction->wallet->increment('balance', $transaction->amount);
-
         $transaction->wallet->owner->notify(new TopUpRequestStatusUpdated($transaction));
 
-        return response()->json($transaction);
+        return redirect()->back()->with('success', 'Top-up request approved successfully.');
     }
 
     public function reject(Transaction $transaction)
@@ -77,13 +75,12 @@ class TopUpRequestController extends Controller
         $this->authorize('update', $transaction);
 
         if ($transaction->type !== 'top-up' || $transaction->status !== 'pending') {
-            return response()->json(['message' => 'Invalid transaction.'], 400);
+            return redirect()->back()->with('error', 'Invalid transaction.');
         }
 
         $transaction->update(['status' => 'rejected']);
-
         $transaction->wallet->owner->notify(new TopUpRequestStatusUpdated($transaction));
 
-        return response()->json($transaction);
+        return redirect()->back()->with('success', 'Top-up request rejected successfully.');
     }
 }

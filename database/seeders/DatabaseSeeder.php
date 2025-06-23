@@ -27,19 +27,20 @@ class DatabaseSeeder extends Seeder
             'name' => 'Example Admin',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
-            'permissions' => json_encode([
+            'permissions' => [
                 'can_accept_withdrawals',
                 'can_reject_withdrawals',
                 'can_accept_topup',
                 'can_reject_topup',
-            ]),
+            ],
         ]);
 
         // Example User
-        User::create([
+        $user = User::create([
             'name' => 'Example User',
             'email' => 'user@example.com',
             'password' => Hash::make('password'),
         ]);
+        $user->wallet()->create();
     }
 }

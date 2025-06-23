@@ -54,7 +54,11 @@ class TopUpRequestStatusUpdated extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'transaction_id' => $this->transaction->id,
+            'amount' => $this->transaction->amount,
+            'user_name' => $this->transaction->wallet->owner->name,
+            'status' => $this->transaction->status,
+            'created_at' => $this->transaction->created_at,
         ];
     }
 }

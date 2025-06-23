@@ -30,4 +30,9 @@ class Wallet extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+
+    public function getOwnerAttribute()
+    {
+        return $this->user ?? $this->admin;
+    }
 }
