@@ -90,10 +90,8 @@ class WithdrawalRequestController extends Controller
     public function approve(Transaction $transaction)
     {
         $this->authorize('update', $transaction);
-
-        if (!Gate::allows('admin-has-permission', 'can_accept_withdrawals')) {
-            return redirect()->back()->with('error', 'You do not have permission to approve withdrawal requests.');
-        }
+        $admin = auth('admin')->user();
+        $this->authorize('acceptWithdrawals', $admin);
 
         if ($transaction->type !== 'withdrawal' || $transaction->status !== 'pending') {
             return redirect()->back()->with('error', 'Invalid transaction.');
@@ -109,10 +107,8 @@ class WithdrawalRequestController extends Controller
     public function reject(Transaction $transaction)
     {
         $this->authorize('update', $transaction);
-
-        if (!Gate::allows('admin-has-permission', 'can_reject_withdrawals')) {
-            return redirect()->back()->with('error', 'You do not have permission to reject withdrawal requests.');
-        }
+        $admin = auth('admin')->user();
+        $this->authorize('rejectWithdrawals', $admin);
 
         if ($transaction->type !== 'withdrawal' || $transaction->status !== 'pending') {
             return redirect()->back()->with('error', 'Invalid transaction.');

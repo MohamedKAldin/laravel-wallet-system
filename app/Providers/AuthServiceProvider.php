@@ -6,6 +6,8 @@ namespace App\Providers;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use App\Models\Transaction;
 use App\Policies\TransactionPolicy;
+use App\Models\Admin;
+use App\Policies\AdminPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -16,6 +18,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         Transaction::class => TransactionPolicy::class,
+        Admin::class => AdminPolicy::class,
     ];
 
     /**
@@ -24,9 +27,5 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerPolicies();
-
-        \Illuminate\Support\Facades\Gate::define('admin-has-permission', function ($admin, $permission) {
-            return is_array($admin->permissions) && in_array($permission, $admin->permissions);
-        });
     }
 }

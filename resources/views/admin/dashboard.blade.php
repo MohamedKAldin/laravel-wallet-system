@@ -85,13 +85,13 @@
                                         <td>{{ $request->amount }} EGP</td>
                                         <td>{{ $request->created_at->diffForHumans() }}</td>
                                         <td>
-                                            @can('admin-has-permission', 'can_accept_topup')
+                                            @can('acceptTopup', $admin)
                                                 <form method="POST" action="/admin/top-up-requests/{{ $request->id }}/approve" class="d-inline">
                                                     @csrf
                                                     <button class="btn btn-success btn-sm">Accept</button>
                                                 </form>
                                             @endcan
-                                            @can('admin-has-permission', 'can_reject_topup')
+                                            @can('rejectTopup', $admin)
                                                 <form method="POST" action="/admin/top-up-requests/{{ $request->id }}/reject" class="d-inline">
                                                     @csrf
                                                     <button class="btn btn-danger btn-sm">Reject</button>
@@ -127,13 +127,13 @@
                                         <td>{{ $request->amount }} EGP</td>
                                         <td>{{ $request->created_at->diffForHumans() }}</td>
                                         <td>
-                                            @can('admin-has-permission', 'can_accept_withdrawals')
+                                            @can('acceptWithdrawals', $admin)
                                                 <form method="POST" action="/admin/withdrawal-requests/{{ $request->id }}/approve" class="d-inline">
                                                     @csrf
                                                     <button class="btn btn-success btn-sm">Accept</button>
                                                 </form>
                                             @endcan
-                                            @can('admin-has-permission', 'can_reject_withdrawals')
+                                            @can('rejectWithdrawals', $admin)
                                                 <form method="POST" action="/admin/withdrawal-requests/{{ $request->id }}/reject" class="d-inline">
                                                     @csrf
                                                     <button class="btn btn-danger btn-sm">Reject</button>

@@ -59,10 +59,8 @@ class TopUpRequestController extends Controller
     public function approve(Transaction $transaction)
     {
         $this->authorize('update', $transaction);
-
-        if (!Gate::allows('admin-has-permission', 'can_accept_topup')) {
-            return redirect()->back()->with('error', 'You do not have permission to approve top-up requests.');
-        }
+        $admin = auth('admin')->user();
+        $this->authorize('acceptTopup', $admin);
 
         if ($transaction->type !== 'top-up' || $transaction->status !== 'pending') {
             return redirect()->back()->with('error', 'Invalid transaction.');
@@ -78,10 +76,8 @@ class TopUpRequestController extends Controller
     public function reject(Transaction $transaction)
     {
         $this->authorize('update', $transaction);
-
-        if (!Gate::allows('admin-has-permission', 'can_reject_topup')) {
-            return redirect()->back()->with('error', 'You do not have permission to reject top-up requests.');
-        }
+        $admin = auth('admin')->user();
+        $this->authorize('rejectTopup', $admin);
 
         if ($transaction->type !== 'top-up' || $transaction->status !== 'pending') {
             return redirect()->back()->with('error', 'Invalid transaction.');
