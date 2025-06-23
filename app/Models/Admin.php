@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class Admin extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -21,6 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'permissions',
     ];
 
     /**
@@ -40,16 +40,16 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'permissions' => 'array',
     ];
 
     public function wallet()
     {
-        return $this->hasOne(Wallet::class, 'user_id');
+        return $this->hasOne(Wallet::class, 'admin_id');
     }
 
     public function referralCodes()
     {
-        return $this->hasMany(ReferralCode::class, 'user_id');
+        return $this->hasMany(ReferralCode::class, 'admin_id');
     }
 }
