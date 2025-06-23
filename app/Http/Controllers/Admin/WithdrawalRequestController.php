@@ -10,6 +10,7 @@ use App\Notifications\WithdrawalRequestStatusUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Gate;
 
 class WithdrawalRequestController extends Controller
 {
@@ -90,6 +91,10 @@ class WithdrawalRequestController extends Controller
     {
         $this->authorize('update', $transaction);
 
+        if (!Gate::allows('admin-has-permission', 'can_accept_withdrawals')) {
+            return redirect()->back()->with('error', 'You do not have permission to approve withdrawal requests.');
+        }
+
         if ($transaction->type !== 'withdrawal' || $transaction->status !== 'pending') {
             return redirect()->back()->with('error', 'Invalid transaction.');
         }
@@ -104,6 +109,10 @@ class WithdrawalRequestController extends Controller
     public function reject(Transaction $transaction)
     {
         $this->authorize('update', $transaction);
+
+        if (!Gate::allows('admin-has-permission', 'can_reject_withdrawals')) {
+            return redirect()->back()->with('error', 'You do not have permission to reject withdrawal requests.');
+        }
 
         if ($transaction->type !== 'withdrawal' || $transaction->status !== 'pending') {
             return redirect()->back()->with('error', 'Invalid transaction.');

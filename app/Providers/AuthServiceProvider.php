@@ -24,5 +24,9 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerPolicies();
+
+        \Illuminate\Support\Facades\Gate::define('admin-has-permission', function ($admin, $permission) {
+            return is_array($admin->permissions) && in_array($permission, $admin->permissions);
+        });
     }
 }
