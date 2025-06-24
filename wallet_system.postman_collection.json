@@ -1,0 +1,199 @@
+{
+  "info": {
+    "name": "Wallet System API",
+    "_postman_id": "wallet-system-collection-001",
+    "description": "API collection for User Wallet System with referral codes and top-up/withdrawal requests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "User Registration",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/api/register", "host": ["{{base_url}}"], "path": ["api", "register"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"New User\",\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password\",\n  \"password_confirmation\": \"password\",\n  \"referral_code\": \"ADMIN123\" // Optional - remove this line if no referral code\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "if (jsonData.access_token) {",
+              "    pm.collectionVariables.set('token', jsonData.access_token);",
+              "    console.log('Token saved:', jsonData.access_token);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{base_url}}/api/login", "host": ["{{base_url}}"], "path": ["api", "login"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "if (jsonData.access_token) {",
+              "    pm.collectionVariables.set('token', jsonData.access_token);",
+              "    console.log('Token saved:', jsonData.access_token);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Authenticated User",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "{{base_url}}/api/user", "host": ["{{base_url}}"], "path": ["api", "user"] }
+      }
+    },
+    {
+      "name": "Create Top-up Request",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "{{base_url}}/api/top-up-requests", "host": ["{{base_url}}"], "path": ["api", "top-up-requests"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 100\n}"
+        }
+      }
+    },
+    {
+      "name": "List User Top-up Requests",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { 
+          "raw": "{{base_url}}/api/top-up-requests?page=1", 
+          "host": ["{{base_url}}"], 
+          "path": ["api", "top-up-requests"],
+          "query": [
+            { "key": "page", "value": "1", "description": "Page number (default: 1)" }
+          ]
+        },
+        "description": "Get paginated list of user's top-up requests. Returns 10 items per page."
+      }
+    },
+    {
+      "name": "Create Withdrawal Request",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "{{base_url}}/api/withdrawal-requests", "host": ["{{base_url}}"], "path": ["api", "withdrawal-requests"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 50\n}"
+        }
+      }
+    },
+    {
+      "name": "List User Withdrawal Requests",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { 
+          "raw": "{{base_url}}/api/withdrawal-requests?page=1", 
+          "host": ["{{base_url}}"], 
+          "path": ["api", "withdrawal-requests"],
+          "query": [
+            { "key": "page", "value": "1", "description": "Page number (default: 1)" }
+          ]
+        },
+        "description": "Get paginated list of user's withdrawal requests. Returns 10 items per page."
+      }
+    },
+    {
+      "name": "Get Wallet Balance",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "{{base_url}}/api/wallet", "host": ["{{base_url}}"], "path": ["api", "wallet"] }
+      }
+    },
+    {
+      "name": "Generate Referral Code",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "{{base_url}}/api/referral-codes/generate", "host": ["{{base_url}}"], "path": ["api", "referral-codes", "generate"] }
+      }
+    },
+    {
+      "name": "Show Current Referral Code",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "{{base_url}}/api/referral-codes/show", "host": ["{{base_url}}"], "path": ["api", "referral-codes", "show"] }
+      }
+    },
+    {
+      "name": "Get Referred Users",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "{{base_url}}/api/referrals", "host": ["{{base_url}}"], "path": ["api", "referrals"] }
+      }
+    }
+  ]
+} 

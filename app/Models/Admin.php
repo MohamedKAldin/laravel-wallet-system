@@ -52,4 +52,18 @@ class Admin extends Authenticatable
     {
         return $this->hasMany(ReferralCode::class, 'admin_id');
     }
+
+    public function scopeWithReferredUsers($query)
+    {
+        return $query->with(['wallet.transactions' => function($query) {
+            $query->referralBonus()->approved();
+        }]);
+    }
+
+    public function scopeWithApprovedWithdrawals($query)
+    {
+        return $query->with(['wallet.transactions' => function($query) {
+            $query->withdrawal()->approved();
+        }]);
+    }
 }

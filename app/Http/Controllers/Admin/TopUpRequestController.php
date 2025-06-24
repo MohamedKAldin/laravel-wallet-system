@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Notifications\TopUpRequestStatusUpdated;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 
 class TopUpRequestController extends Controller
 {
@@ -60,10 +59,14 @@ class TopUpRequestController extends Controller
     {
         $this->authorize('update', $transaction);
         $admin = auth('admin')->user();
-        $this->authorize('acceptTopup', $admin);
 
         if ($transaction->type !== 'top-up' || $transaction->status !== 'pending') {
             return redirect()->back()->with('error', 'Invalid transaction.');
+        }
+
+        // Prevent admin from approving their own request
+        if ($transaction->isCreatedByAdmin($admin)) {
+            return redirect()->back()->with('error', 'You cannot approve your own top-up request.');
         }
 
         $transaction->update(['status' => 'approved']);
@@ -77,10 +80,14 @@ class TopUpRequestController extends Controller
     {
         $this->authorize('update', $transaction);
         $admin = auth('admin')->user();
-        $this->authorize('rejectTopup', $admin);
 
         if ($transaction->type !== 'top-up' || $transaction->status !== 'pending') {
             return redirect()->back()->with('error', 'Invalid transaction.');
+        }
+
+        // Prevent admin from rejecting their own request
+        if ($transaction->isCreatedByAdmin($admin)) {
+            return redirect()->back()->with('error', 'You cannot reject your own top-up request.');
         }
 
         $transaction->update(['status' => 'rejected']);

@@ -42,8 +42,9 @@ class TopUpRequestController extends Controller
             'description' => 'User top-up request.',
         ]);
 
-        $admins = Admin::all();
-        Notification::send($admins, new NewTopUpRequest($transaction));
+        // Notify all admins about the new top-up request
+        $allAdmins = Admin::all();
+        Notification::send($allAdmins, new NewTopUpRequest($transaction));
 
         return response()->json($transaction, 201);
     }

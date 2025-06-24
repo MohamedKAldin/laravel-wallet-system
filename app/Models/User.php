@@ -52,4 +52,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(ReferralCode::class, 'user_id');
     }
+
+    public function scopeWhoUsedAdminReferralCode($query, $adminName)
+    {
+        return $query->whereHas('wallet.transactions', function($query) use ($adminName) {
+            $query->referralBonus()
+                  ->approved()
+                  ->where('description', 'like', 'Referral bonus from ' . $adminName . ' (Code: %');
+        })->with(['wallet.transactions' => function($query) use ($adminName) {
+            $query->referralBonus()
+                  ->approved()
+                  ->where('description', 'like', 'Referral bonus from ' . $adminName . ' (Code: %');
+        }]);
+    }
 }

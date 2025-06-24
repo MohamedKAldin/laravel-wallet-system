@@ -29,7 +29,7 @@ class WithdrawalRequestStatusUpdated extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['database', 'mail'];
     }
 
     /**
@@ -39,10 +39,11 @@ class WithdrawalRequestStatusUpdated extends Notification implements ShouldQueue
     {
         $status = $this->transaction->status;
         $amount = $this->transaction->amount;
-
         return (new MailMessage)
             ->subject('Withdrawal Request Status Updated')
+            ->greeting('Hello ' . $notifiable->name . ',')
             ->line("Your withdrawal request for {$amount} EGP has been {$status}.")
+            ->action('View Request', url('/admin/withdrawal-requests/' . $this->transaction->id))
             ->line('Thank you for using our application!');
     }
 
@@ -54,7 +55,11 @@ class WithdrawalRequestStatusUpdated extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'transaction_id' => $this->transaction->id,
+            'amount' => $this->transaction->amount,
+            'admin_name' => $this->transaction->wallet->owner->name,
+            'status' => $this->transaction->status,
+            'created_at' => $this->transaction->created_at,
         ];
     }
 }

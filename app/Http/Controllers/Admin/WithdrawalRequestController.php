@@ -10,7 +10,6 @@ use App\Notifications\WithdrawalRequestStatusUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Gate;
 
 class WithdrawalRequestController extends Controller
 {
@@ -42,7 +41,7 @@ class WithdrawalRequestController extends Controller
         $admin = $request->user();
 
         if ($admin->wallet->balance < $request->amount) {
-            return redirect()->back()->with('error', 'Insufficient balance.');
+            return redirect()->back()->with('error', 'Insufficient balance. Available balance: ' . number_format($admin->wallet->balance, 2) . ' EGP. Please top up your wallet to proceed with this withdrawal request.');
         }
 
         $transaction = $admin->wallet->transactions()->create([
@@ -55,8 +54,9 @@ class WithdrawalRequestController extends Controller
         $admin->wallet->decrement('balance', $request->amount);
         $admin->wallet->increment('held_balance', $request->amount);
 
-        $otherAdmins = Admin::where('id', '!=', $admin->id)->get();
-        Notification::send($otherAdmins, new NewWithdrawalRequest($transaction));
+        // Notify all admins about the new withdrawal request
+        $allAdmins = Admin::all();
+        Notification::send($allAdmins, new NewWithdrawalRequest($transaction));
 
         return redirect()->back()->with('success', 'Withdrawal request submitted successfully.');
     }
@@ -91,10 +91,13 @@ class WithdrawalRequestController extends Controller
     {
         $this->authorize('update', $transaction);
         $admin = auth('admin')->user();
-        $this->authorize('acceptWithdrawals', $admin);
 
         if ($transaction->type !== 'withdrawal' || $transaction->status !== 'pending') {
             return redirect()->back()->with('error', 'Invalid transaction.');
+        }
+
+        if ($transaction->isCreatedByAdmin($admin)) {
+            return redirect()->back()->with('error', 'You cannot approve your own withdrawal request.');
         }
 
         $transaction->update(['status' => 'approved']);
@@ -108,10 +111,13 @@ class WithdrawalRequestController extends Controller
     {
         $this->authorize('update', $transaction);
         $admin = auth('admin')->user();
-        $this->authorize('rejectWithdrawals', $admin);
 
         if ($transaction->type !== 'withdrawal' || $transaction->status !== 'pending') {
             return redirect()->back()->with('error', 'Invalid transaction.');
+        }
+
+        if ($transaction->isCreatedByAdmin($admin)) {
+            return redirect()->back()->with('error', 'You cannot reject your own withdrawal request.');
         }
 
         $transaction->update(['status' => 'rejected']);

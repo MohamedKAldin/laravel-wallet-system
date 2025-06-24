@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\TopUpRequestController;
 use App\Http\Controllers\Admin\WithdrawalRequestController;
+use App\Http\Controllers\Admin\ReferralCodeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('top-up-requests', [TopUpRequestController::class, 'index'])->name('top-up-requests.index');
@@ -14,4 +15,8 @@ Route::get('withdrawal-requests', [WithdrawalRequestController::class, 'index'])
 Route::post('withdrawal-requests', [WithdrawalRequestController::class, 'store'])->name('withdrawal-requests.store');
 Route::get('withdrawal-requests/{transaction}', [WithdrawalRequestController::class, 'show'])->name('withdrawal-requests.show');
 Route::post('withdrawal-requests/{transaction}/approve', [WithdrawalRequestController::class, 'approve'])->name('withdrawal-requests.approve');
-Route::post('withdrawal-requests/{transaction}/reject', [WithdrawalRequestController::class, 'reject'])->name('withdrawal-requests.reject'); 
+Route::post('withdrawal-requests/{transaction}/reject', [WithdrawalRequestController::class, 'reject'])->name('withdrawal-requests.reject');
+
+// Referral codes
+Route::post('referral-codes/generate', [ReferralCodeController::class, 'generate'])->name('referral-codes.generate');
+Route::get('referral-codes/show', [ReferralCodeController::class, 'show'])->name('referral-codes.show'); 

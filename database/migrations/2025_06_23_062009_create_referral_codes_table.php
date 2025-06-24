@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('admin_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('code')->unique();
-            $table->string('status')->default('active'); // e.g., 'active', 'inactive', 'used'
+            $table->string('status')->default('active'); // 'active', 'inactive'
             $table->timestamps();
         });
     }
