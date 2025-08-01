@@ -13,7 +13,7 @@ This project is a comprehensive wallet system with separate admin and user funct
 - **Transaction Tracking**: All referral bonuses are recorded as transactions
 
 ### 💰 Top-up Requests
-- **User Requests**: Users can create top-up requests via API or web interface
+- **User Requests**: Users can create top-up requests via API or web interface (Admin users only)
 - **Admin Approval**: Admins can approve or reject top-up requests from their dashboard
 - **Automatic Processing**: Approved requests automatically add funds to user wallets
 - **Notifications**: Users receive email notifications about request status
@@ -213,7 +213,17 @@ Use the provided Postman collection (`wallet_system.postman_collection.json`) to
 
 - **Referral Codes**: Can be used multiple times, but only the latest generated code per user/admin is active
 - **Permissions**: All admin actions are controlled through the TransactionPolicy
-- **Notifications**: Uses Laravel's notification system with database and mail drivers
+- **Notifications**: Uses Laravel's notification system with database and mail drivers (For local testing i used laravel.log) :
+    ```
+        MAIL_MAILER=log
+        MAIL_HOST=mailpit
+        MAIL_PORT=1025
+        MAIL_USERNAME=null
+        MAIL_PASSWORD=null
+        MAIL_ENCRYPTION=null
+        MAIL_FROM_ADDRESS="hello@example.com"
+        MAIL_FROM_NAME="${APP_NAME}"
+    ```
 - **API**: RESTful API with proper authentication and validation
 - **Web Interface**: Bootstrap-based responsive design for both admin and user dashboards
 
